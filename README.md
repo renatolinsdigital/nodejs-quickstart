@@ -19,10 +19,38 @@ __High Performance__: Node.js is built on the V8 JavaScript engine, developed by
 
 __Scalability__: Node.js is designed to build scalable network applications. It can handle many connections simultaneously with high throughput, making it ideal for applications that require handling many simultaneous requests, such as APIs and microservices.
 
+### 2. Node.js Architecture overview
 
-### 2. Running Node.js on your machine
+Understanding Node.js architecture is crucial for developers aiming to craft high-quality applications. It aids in performance optimization, effective debugging, dependency management, security, and best practices adherence. Some essential parts of Node.js architecture are:
 
-When you install Node.js on your computer, it essentially enables you to use JavaScript to communicate with your system directly. This means you can do things like automate tasks, create servers, manage files, and interact with databases using JavaScript. It expands the reach of JavaScript beyond just web browsers, allowing you to tap into the full potential of the language. Let's now delve into how we can harness JavaScript's power on our machines with the assistance of Node.js.
+__V8 Engine__: The V8 engine is developed by Google and is written in C++. It is responsible for executing JavaScript code in the Node.js environment. V8 compiles JavaScript code into machine code directly, which improves performance. It also manages memory allocation and garbage collection.
+
+__Libuv__: Libuv is a multi-platform library with origins in the Node.js project. It abstracts operating system-specific functionality related to asynchronous I/O operations, file system operations, and networking. Node.js integrates Libuv to handle asynchronous operations efficiently, providing a unified interface across different operating systems. Libuv is crucial for Node.js's event loop mechanism, as it provides the underlying infrastructure for managing events, timers, and callbacks.
+
+__Event Loop__: The event loop is at the core of Node.js's asynchronous, non-blocking I/O model. It continuously checks for events and executes corresponding callbacks when events occur. The event loop operates in phases such as timers, I/O polling, setImmediate, and close callbacks. Each phase handles different types of events and callbacks.
+
+__Event Queue__: Events and their associated callbacks are queued in different event queues based on their type. For example, I/O-related callbacks go to the I/O event queue.
+
+__Call Stack__: The call stack is part of the V8 engine and is responsible for managing the execution context of JavaScript code. Each function call creates a stack frame that contains information about the function's execution, including local variables and arguments.
+
+__LIFO Structure__: The call stack operates on a Last-In-First-Out (LIFO) basis, where the most recently called function is processed first.
+
+__Asynchronous Operations__: When Node.js encounters asynchronous operations, such as I/O requests or timers, they are offloaded to the event loop and do not block the call stack. Once the asynchronous operation completes, its callback is added to the event queue and eventually processed by the event loop.
+
+__HTTP and TCP/UDP__: Node.js provides built-in modules like http, https, net (for TCP), and dgram (for UDP) for handling network protocols. Developers can create HTTP(S) servers using the http or https modules, handle incoming requests, and send responses asynchronously. These modules leverage Node.js's event-driven architecture, allowing efficient handling of network events like incoming requests, data transmission, and connection management.
+
+__NPM (Node Package Manager)__: NPM is bundled with Node.js and serves as a package manager for installing, managing, and sharing JavaScript packages. Developers define dependencies and metadata in the package.json file, which NPM uses to manage package installations and versioning.
+
+__Ecosystem__: NPM provides access to a vast ecosystem of open-source libraries and tools, allowing developers to leverage existing solutions and accelerate development.
+
+__Native Add-ons__: Node.js allows developers to create native add-ons using C/C++ to extend its capabilities or integrate with existing native libraries. Native add-ons are beneficial for performance-critical tasks that require low-level system access or integration with hardware.
+
+__Bindings__: Node.js provides bindings that enable communication between JavaScript code and native add-ons, facilitating seamless integration and interoperability.
+
+
+### 3. Running Node.js locally
+
+When we install Node.js on our machine, it essentially enables JavaScript to communicate with our system directly. This means we can do things like automate tasks, create servers, manage files, and interact with databases using JavaScript. It expands the reach of JavaScript beyond just web browsers, allowing us to unlock the full potential of Javascript. Let's now delve into how we can harness JavaScript's power on our machines with the assistance of Node.js.
 
 1. __Installing Node.js__
 
@@ -122,6 +150,8 @@ fs.writeFile(fileName, textToWrite, (err) => {
 ```
 
 This code loads the built-in "file system" module (fs) in Node.js, defines a file name as example.txt, prepares a string containing some text, writes the content of the string to the file specified by fileName, and logs either an error or success message based on the writing process. To learn more about what can be done with Node.js, including its built-in modules like "file system" (fs), you can refer to the official Node.js documentation available on their website: __https://nodejs.org/docs/latest/api__. Additionally, there are various tutorials, courses, and online resources dedicated to learning Node.js that can provide comprehensive information on its capabilities and usage.
+
+Ps. While loading modules using the ```require``` function is the traditional approach in Node.js, we'll also explore how to achieve this using __ES Modules__ later on.
 
 5. __Understanding Node Package Manager (npm)__
 
@@ -245,3 +275,198 @@ If you intend to upload or share your project on a Git platform, you should inst
 * Install Yarn or any other package manager if the project does not use npm
 * Install the dependencies listed in the package.json file. For example, by running ```npm install``` for npm or ```yarn``` for Yarn
 * Launch the project. If scripts are not defined in the package.json file, the project is typically executed with ```node <script_name>.js```. However, if a 'start' script is configured and Yarn is being used, the project can be started with the ```yarn start``` command
+
+### 5. Module Systems in Node.js: CommonJS and ES Modules
+
+Node.js supports two primary module systems: CommonJS and ES Modules. Each system has its own syntax, capabilities, and use cases. Understanding both is crucial for Node.js development.
+
+1) __CommonJS__
+
+CommonJS was the original module system in Node.js. It uses synchronous loading and is widely supported across the Node.js ecosystem.
+
+Syntax:
+
+Exporting: Modules export their functionality using ```module.exports``` or simply ```exports```.
+Importing: Modules are imported using the ```require``` function.
+
+Example:
+
+```javascript
+// Exporting using module.exports
+module.exports.add = (a, b) => a + b;
+module.exports.subtract = (a, b) => a - b;
+```
+
+```javascript
+// Importing using require
+const math = require('./math');
+console.log(math.add(2, 3)); // Output: 5
+console.log(math.subtract(5, 3)); // Output: 2
+```
+
+Features:
+
+* Synchronous Loading: Modules are loaded synchronously, which can block execution if loading takes time.
+* Dynamic Imports: You can conditionally load modules using require statements anywhere in your code.
+* Scope: Each file has its own module scope, preventing global variable pollution.
+
+Usage: 
+
+CommonJS is ideal for server-side applications where synchronous loading does not impact performance significantly and dynamic module loading is beneficial.
+
+2) __ES Modules (preferred for modern projects)__
+
+ES Modules (ESM) is the modern standard for JavaScript modules. It was introduced in ECMAScript 2015 (ES6) and is supported by modern JavaScript environments, including Node.js.
+
+Syntax:
+
+Exporting: Modules export functionality using ```export``` and ```export default```.
+Importing: Modules are imported using ```import``` statement.
+
+Example:
+
+```javascript
+// math.js
+// Exporting using named exports
+export const add = (a, b) => a + b;
+export const subtract = (a, b) => a - b;
+```
+
+```javascript
+// Importing using import statements
+import { add, subtract } from './math.mjs';
+console.log(add(2, 3)); // Output: 5
+console.log(subtract(5, 3)); // Output: 2
+```
+
+Features:
+
+* Static Analysis: The structure of ES modules can be analyzed at compile time, enabling optimizations like tree shaking.
+* Asynchronous Loading: ES modules can be loaded asynchronously, which can improve performance by parallelizing the loading process.
+* Syntax: The import and export syntax is more declarative and intuitive.
+* Interoperability: ES modules can import CommonJS modules, although the reverse is not directly possible without workarounds.
+
+Usage:
+
+ES modules are ideal for both client-side and server-side applications. They align with modern JavaScript standards and are supported natively in browsers, promoting code reuse across different environments.
+
+Example of Asynchronous Loading with ES Modules:
+
+```javascript
+// Importing dynamically using import()
+import('./math.js').then(math => {
+    console.log(math.add(2, 3)); // Output: 5
+});
+```
+
+In the given context, import() is used as an asynchronous function. It loads and executes the 'math.js' module asynchronously, returning a promise. We can handle the loaded module using .then() after it has been successfully loaded.
+
+__Configuring Node.js to work with ES Nodules__:
+
+* Method 1: Use the .mjs extension for your JavaScript scripts. For example: ```script.mjs```.
+
+* Method 2: Adding ```"type": "module"``` at the top level of your ```package.json```:
+
+ ```json
+ {
+  "name": "your-project-name",
+  "version": "1.0.0",
+  "type": "module",
+  // other fields...
+}
+ ```
+ 
+Ps1. Since method 2 requires changes in only one place, it is the preferred option.
+
+Ps2. Choosing between CommonJS and ES Modules depends on compatibility, performance, and syntax preferences. CommonJS is widely supported in Node.js, making it the standard for legacy projects and many existing npm packages, but its synchronous loading can be a bottleneck. ES Modules, are preferred for new projects that require compatibility with both Node.js and browsers, offering asynchronous loading that improves performance through parallel module fetching and execution. 
+
+### 6. Node.js core modules and usage examples
+
+Node.js core modules are like ready-to-use tools that come with every Node.js installation. They offer essential functions for tasks like file system operations, creating HTTP servers, handling events, and more. These modules are included with Node.js, so you can use them right away without extra setup. 
+
+The complete list of Node.js modules and their related documentation can be found here: https://nodejs.org/api/modules.html. To illustrate the usage of Node.js core modules, we have the following examples:
+
+__fs (File System)__: The __fs__ module enables reading, writing, and manipulating files and directories on the file system.
+
+```javascript
+import { writeFile, readFile } from 'fs/promises';
+
+const content = 'Hello, Node.js!';
+
+// Writing to a file
+writeFile('example.txt', content)
+  .then(() => console.log('File written successfully.'))
+  .catch((err) => console.error(err));
+
+// Reading from a file
+readFile('example.txt', 'utf8')
+  .then((data) => console.log(data))
+  .catch((err) => console.error(err));
+```
+
+__http/https (HTTP/HTTPS Servers)__: The __http__ and __https__ modules facilitate creating web servers and handling requests/responses.
+
+```javascript
+import http from 'http';
+
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.end('Hello, Node.js HTTP Server!');
+});
+
+server.listen(3000, () => {
+  console.log('HTTP server running on port 3000');
+});
+```
+
+__events (EventEmitter)__: The events module allows implementing event-driven architectures and custom event handling.
+
+```javascript
+const EventEmitter = require('events');
+
+class MyEmitter extends EventEmitter {}
+
+const myEmitter = new MyEmitter();
+
+myEmitter.on('customEvent', (arg) => {
+  console.log('Custom event triggered:', arg);
+});
+
+myEmitter.emit('customEvent', 'Hello, Node.js Events!');
+```
+
+__util (Utility Functions)__: The util module provides utility functions for various tasks such as object inspection, data conversion, and function inheritance.
+
+Example (Promisify a Function):
+
+```javascript
+import { promisify } from 'util';
+import { readFile } from 'fs';
+
+const readFileAsync = promisify(readFile);
+
+readFileAsync('example.txt', 'utf8')
+  .then((data) => {
+    console.log('File content:', data);
+  })
+  .catch((err) => {
+    console.error('Error reading file:', err);
+  });
+```
+
+__path (File Path Handling)__: The path module deals with file and directory path manipulation, resolving and joining paths, and handling platform-specific path differences.
+
+```javascript
+import path from 'path';
+
+const filePath = '/home/user/files/example.txt';
+const absolutePath = path.resolve(filePath);
+
+console.log('Absolute Path:', absolutePath);
+```
+
+
+
+
+
+
