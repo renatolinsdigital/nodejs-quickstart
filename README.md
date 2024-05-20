@@ -361,7 +361,7 @@ import('./math.js').then(math => {
 
 In the given context, import() is used as an asynchronous function. It loads and executes the 'math.js' module asynchronously, returning a promise. We can handle the loaded module using .then() after it has been successfully loaded.
 
-__Configuring Node.js to work with ES Nodules__:
+__Configuring Node.js to work with ES Modules__:
 
 * Method 1: Use the .mjs extension for your JavaScript scripts. For example: ```script.mjs```.
 
