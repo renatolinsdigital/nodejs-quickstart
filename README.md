@@ -371,8 +371,7 @@ __Configuring Node.js to work with ES Nodules__:
  {
   "name": "your-project-name",
   "version": "1.0.0",
-  "type": "module",
-  // other fields...
+  "type": "module"
 }
  ```
  
