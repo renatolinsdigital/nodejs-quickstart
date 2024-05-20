@@ -385,7 +385,7 @@ Node.js core modules are like ready-to-use tools that come with every Node.js in
 
 The complete list of Node.js modules and their related documentation can be found here: https://nodejs.org/api/modules.html. To illustrate the usage of Node.js core modules, we have the following examples:
 
-__fs (File System)__: The __fs__ module enables reading, writing, and manipulating files and directories on the file system.
+* __fs (File System)__: The __fs__ module enables reading, writing, and manipulating files and directories on the file system.
 
 ```javascript
 import { writeFile, readFile } from 'fs/promises';
@@ -403,7 +403,7 @@ readFile('example.txt', 'utf8')
   .catch((err) => console.error(err));
 ```
 
-__http/https (HTTP/HTTPS Servers)__: The __http__ and __https__ modules facilitate creating web servers and handling requests/responses.
+* __http/https (HTTP/HTTPS Servers)__: The __http__ and __https__ modules facilitate creating web servers and handling requests/responses.
 
 ```javascript
 import http from 'http';
@@ -418,7 +418,7 @@ server.listen(3000, () => {
 });
 ```
 
-__events (EventEmitter)__: The events module allows implementing event-driven architectures and custom event handling.
+* __events (EventEmitter)__: The events module allows implementing event-driven architectures and custom event handling.
 
 ```javascript
 const EventEmitter = require('events');
@@ -434,7 +434,7 @@ myEmitter.on('customEvent', (arg) => {
 myEmitter.emit('customEvent', 'Hello, Node.js Events!');
 ```
 
-__util (Utility Functions)__: The util module provides utility functions for various tasks such as object inspection, data conversion, and function inheritance.
+* __util (Utility Functions)__: The util module provides utility functions for various tasks such as object inspection, data conversion, and function inheritance.
 
 Example (Promisify a Function):
 
@@ -453,7 +453,7 @@ readFileAsync('example.txt', 'utf8')
   });
 ```
 
-__path (File Path Handling)__: The path module deals with file and directory path manipulation, resolving and joining paths, and handling platform-specific path differences.
+* __path (File Path Handling)__: The path module deals with file and directory path manipulation, resolving and joining paths, and handling platform-specific path differences.
 
 ```javascript
 import path from 'path';
