@@ -7,9 +7,7 @@ Node.js was initially created by Ryan Dahl in 2009 with the specific purpose of 
 
 ### 1. Considerations about Node.js
 
-Learning Node.js can significantly boost your career prospects in the tech industry. It's in high demand across various sectors due to its versatility, scalability, and performance capabilities. Mastering Node.js opens doors to opportunities in web development, microservices architecture, real-time applications, and remote work. With a growing ecosystem, strong community support, and adoption by leading companies, Node.js skills can lead to competitive salaries and future-proof your career in the ever-evolving tech landscape.
-
-Key Features of Node.js:
+Learning Node.js can significantly boost your career prospects in the tech industry. It's in high demand across various sectors due to its versatility, scalability, and performance capabilities. Mastering Node.js opens doors to opportunities in web development, microservices architecture, real-time applications, and remote work. With a growing ecosystem, strong community support, and adoption by leading companies, Node.js skills can lead to competitive salaries and future-proof your career in the ever-evolving tech landscape. Key Features of Node.js:
 
 __Asynchronous and Event-Driven__: Node.js uses an event-driven, non-blocking I/O model, which makes it lightweight and efficient. This is particularly well-suited for applications that require a lot of I/O operations, such as web servers and real-time applications.
 
@@ -47,12 +45,11 @@ __Native Add-ons__: Node.js allows developers to create native add-ons using C/C
 
 __Bindings__: Node.js provides bindings that enable communication between JavaScript code and native add-ons, facilitating seamless integration and interoperability.
 
-
 ### 3. Running Node.js locally
 
 When we install Node.js on our machine, it essentially enables JavaScript to communicate with our system directly. This means we can do things like automate tasks, create servers, manage files, and interact with databases using JavaScript. It expands the reach of JavaScript beyond just web browsers, allowing us to unlock the full potential of Javascript. Let's now delve into how we can harness JavaScript's power on our machines with the assistance of Node.js.
 
-1. __Installing Node.js__
+__1. Installing Node.js__
 
 To get started with Node.js, follow these steps:
 
@@ -68,7 +65,7 @@ e. After installation, open the terminal (Command Prompt on Windows, Terminal on
 
 Now, you can execute Node.js scripts directly from the command line using the node command. This will launch the Node.js interpreter, denoted by the > prompt. From here, you can execute JavaScript commands. For instance, typing console.log('Hello, Node.js!') will output 'Hello, Node.js!' in the terminal. To exit the Node.js interpreter, type ```.exit``` or ```Ctrl + C``` twice.
 
-2. __Installing Visual Studio Code and Essential Plugins for JavaScript Development__
+__2. Installing Visual Studio Code and Essential Plugins for JavaScript Development__
 
 Visual Studio Code (VS Code) is a powerful code editor developed by Microsoft, known for its versatility and lightweight design. To install VS Code, visit __code.visualstudio.com__, download and run the installer for your operating system, then follow the on-screen instructions to complete the installation process.
 
@@ -86,7 +83,7 @@ __Code Spell Checker(by Street Side Software)__:  This extension helps maintain 
 
 General Configuration: Visual Studio Code allows you to customize settings, keybindings, and themes to suit your preferences. Explore the various features provided by VS Code and its plugins to enhance your JavaScript development experience.
 
-3. __Automatic code formatting with Prettier__
+__3. Automatic code formatting with Prettier__
 
 To enable automatic code formatting with Prettier upon saving JavaScript files, create a folder named __.vscode__ in the root directory of your project. Inside this folder, include a file named __settings.json__ with the following configuration:
 
@@ -114,7 +111,7 @@ In this example: __"singleQuote"__ Configures Prettier to use single quotes inst
 
 To explore more options and documentation for Prettier, you can visit __prettier.io__
 
-4. __Running Javascript code with Node.js capabilities__
+__4. Running Javascript code with Node.js capabilities__
 
 With Visual Studio Code open, navigate to the desired folder (where your project will be), right-click, and select 'New File'. Name it with a .js extension (e.g., __scripts.js__). Inside this file, you can write your JavaScript code, like the following:
 
@@ -153,7 +150,7 @@ This code loads the built-in "file system" module (fs) in Node.js, defines a fil
 
 Ps. While loading modules using the ```require``` function is the traditional approach in Node.js, we'll also explore how to achieve this using __ES Modules__ later on.
 
-5. __Understanding Node Package Manager (npm)__
+__5. Understanding Node Package Manager (npm)__
 
 Node Package Manager (npm) is a powerful tool used to manage JavaScript packages and dependencies for Node.js projects. npm is the default package manager for Node.js and JavaScript projects. It allows developers to easily install, publish, and manage packages and dependencies for their Node.js projects. These packages contain reusable JavaScript code, libraries, frameworks, and tools that enhance development productivity and extend the functionality of Node.js applications.
 
@@ -171,7 +168,7 @@ Benefits of Using npm:
 
 Installation of npm: npm typically comes bundled with Node.js installation. When you install Node.js on your computer, npm is automatically installed along with it. Therefore, to install npm, you need to install Node.js first.
 
-6. __Installing and managing dependencies__
+__6. Installing and managing dependencies__
 
 To install an npm package, open your terminal or command prompt, navigate to your project directory, and run the command ```npm install <package-name>```. For example, to install a popular 
 JavaScript utility library called __lodash__, consider running ```npm install lodash``` or simply ```npm i lodash```. So we have some things to consider:
@@ -207,7 +204,7 @@ __Listing installed dependencies:__ You can check all installed packages and the
 
 With npm, we can incorporate libraries to run alongside our project's automated processes. For example, we can download a specific library and use it as our code linter by running ```npm run lint```. While configuring this type of usage is beyond the scope of this tutorial, it's not difficult to set up and plenty of examples can be found online. Additionally, you can use ```npm help``` to discover more commands enabled by npm. By leveraging npm, you can streamline your Node.js development process, efficiently manage project dependencies, and access a vast ecosystem of JavaScript packages and tools.
 
-7. __Using Yarn or other package managers__
+__7. Using Yarn or other package managers__
 
 Yarn, developed by Facebook is known for its speed, efficiency, and user-friendly nature. It ensures consistent installations and expedites package management through caching techniques. Yarn also facilitates concurrent task execution and provides clear error messages. npm, a cornerstone since 2010, comes bundled with Node.js and boasts a vast library of packages, valued for its straightforward installation process.
 
@@ -233,7 +230,7 @@ If Yarn appears to better suit your project needs, adopting it doesn't necessita
 
 Furthermore, it's crucial to recognize that technology continually evolves, leading to the emergence of new package managers with enhanced user-friendly features. An example of this is pnpm, an alternative to npm, boasting benefits such as efficient dependency storage and performance enhancements. Thus, remaining open to such advancements ensures staying abreast of the latest tools and practices in software development.
 
-8. __Adding 'hot reload' with the help of nodemon__
+__8. Adding 'hot reload' with the help of nodemon__
 
 Consider a scenario where you aim to use Yarn and automate the execution of your JavaScript code every time you save a file. Initially, you need to install Yarn globally using the command ```npm install -g yarn```. Next, install a package that monitors file changes and triggers execution using Node.js. You can achieve this by adding nodemon as a development dependency with ```yarn add nodemon -D```. Once the necessary dependencies are installed, configure a 'start' script in your package.json file to watch and execute your scripts upon saving. This can be done by adding a 'scripts' entry to package.json:
 
@@ -245,7 +242,7 @@ Consider a scenario where you aim to use Yarn and automate the execution of your
 
 Here's where the 'magic' happens: running ```yarn start```. From now on, any changes made to scripts.js and saved will automatically trigger our code to rerun. Pretty neat, right? To stop watching, simply navigate to the terminal and press Ctrl + C.
 
-9. __Installing and Managing Multiple Versions of Node.js with NVM__
+__9. Installing and Managing Multiple Versions of Node.js with NVM__
 
 In certain scenarios, managing multiple projects with varying Node.js versions can become cumbersome. Reinstalling different Node.js versions or manually updating environment variables for each project switch isn't practical. To address this challenge, tools like Node Version Manager (nvm) provide a solution by simplifying the installation and usage of any Node.js version released to date. Hence, we can explore:
 
@@ -266,7 +263,7 @@ After the installation, you can verify the NVM Version by running ```nvm --versi
 
 Note: If the ```nvm use``` command has never been run, no version will be used, even if Node.js has already been installed on your machine.
 
-10. __Documenting shareable projects that use Node.js__
+__10. Documenting shareable projects that use Node.js__
 
 If you intend to upload or share your project on a Git platform, you should instruct others to:
 
@@ -274,7 +271,7 @@ If you intend to upload or share your project on a Git platform, you should inst
 * Ensure that Node.js is installed on their machines, which also includes npm
 * Install Yarn or any other package manager if the project does not use npm
 * Install the dependencies listed in the package.json file. For example, by running ```npm install``` for npm or ```yarn``` for Yarn
-* Launch the project. If scripts are not defined in the package.json file, the project is typically executed with ```node <script_name>.js```. However, if a 'start' script is configured and Yarn is being used, the project can be started with the ```yarn start``` command
+* Launch the project. If scripts are not defined in the package.json file, the project is typically executed with ```node <script_name>.js```. However, if a 'start' script is configured and Yarn is being used, the project can be started with the ```yarn start``` command  
 
 ### 5. Module Systems in Node.js: CommonJS and ES Modules
 
