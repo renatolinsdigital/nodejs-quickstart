@@ -2,7 +2,7 @@
 
 *An Essential compilation by Renato Lins*
 
-![Repo Banner](img/banner.jpg)
+![Repo Banner](img/repo_banner.jpg)
 
 Node.js was created by Ryan Dahl in 2009 to run JavaScript **outside the browser**, on servers. He took Google's V8 JavaScript engine, attached an event loop and non-blocking I/O to it, and showed that one process could handle thousands of concurrent connections. Since then Node.js has become one of the most widely used platforms for web APIs, real-time services, command-line tools, build tooling (almost every front-end tool runs on Node), desktop apps (Electron) and serverless functions.
 
