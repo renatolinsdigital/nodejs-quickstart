@@ -1,4 +1,6 @@
-# Node.js Quickstart — Essential notes by Renato Lins
+# Understanding Node.js Well
+
+*Essential notes by Renato Lins*
 
 Node.js was created by Ryan Dahl in 2009 to run JavaScript **outside the browser**, on servers. He took Google's V8 JavaScript engine, attached an event loop and non-blocking I/O to it, and showed that one process could handle thousands of concurrent connections without one thread per connection. Since then Node.js has become one of the most widely used platforms for web APIs, real-time services, command-line tools, build tooling (almost every front-end tool runs on Node), desktop apps (Electron) and serverless functions.
 
@@ -368,16 +370,17 @@ Run it with `npx eslint .`.
 Knowing the layers explains most of Node's behavior: why I/O does not block, why CPU work does, and where performance problems come from.
 
 ```mermaid
+%%{init: {"htmlLabels": false, "flowchart": {"htmlLabels": false, "wrappingWidth": 400, "padding": 24}}}%%
 flowchart TB
-    APP["Your code + npm packages<br/>(JavaScript / TypeScript)"]
+    APP["Your code<br/>+ npm packages<br/>JS or TypeScript"]
     subgraph NODE["Node.js runtime"]
-        LIB["Node.js standard library (JavaScript)<br/>fs, http, net, crypto, stream, events..."]
-        BIND["C++ bindings<br/>(bridge between JS and native code)"]
-        V8["V8<br/>runs JavaScript, manages memory"]
-        UV["libuv<br/>event loop, async I/O, thread pool"]
-        DEPS["Other native libraries<br/>llhttp, OpenSSL, zlib, c-ares, ICU, nghttp2, simdutf, ada"]
+        LIB["Node.js standard library<br/>written in JavaScript<br/>fs, http, net, crypto,<br/>stream, events..."]
+        BIND["C++ bindings<br/>bridge between JS<br/>and native code"]
+        V8["V8<br/>runs JavaScript<br/>manages memory"]
+        UV["libuv<br/>event loop<br/>async I/O<br/>thread pool"]
+        DEPS["Other native libraries<br/>llhttp, OpenSSL, zlib,<br/>c-ares, ICU, nghttp2,<br/>simdutf, ada"]
     end
-    OS["Operating system<br/>sockets, files, timers, processes<br/>epoll (Linux), kqueue (macOS), IOCP (Windows)"]
+    OS["Operating system<br/>sockets, files, timers,<br/>processes<br/>epoll on Linux<br/>kqueue on macOS<br/>IOCP on Windows"]
 
     APP --> LIB --> BIND
     BIND --> V8
@@ -409,12 +412,13 @@ flowchart TB
 V8 does **not** simply interpret JavaScript, and it does not compile everything ahead of time either. It uses a **multi-tier JIT (Just-In-Time) pipeline**: start running quickly, watch what the code actually does, then spend compile time only on the code that runs often ("hot" code).
 
 ```mermaid
+%%{init: {"htmlLabels": false, "flowchart": {"htmlLabels": false, "wrappingWidth": 400, "padding": 24}}}%%
 flowchart LR
     SRC["JavaScript source"] --> PARSE["Parser<br/>source to AST"]
-    PARSE --> IGN["Ignition<br/>interpreter: AST to bytecode,<br/>runs it, collects type feedback"]
+    PARSE --> IGN["Ignition<br/>interpreter<br/>AST to bytecode<br/>collects type feedback"]
     IGN -- "warm" --> SP["Sparkplug<br/>baseline compiler<br/>fast, no optimizations"]
-    SP -- "hot" --> MAG["Maglev<br/>mid-tier optimizing compiler"]
-    MAG -- "very hot" --> TF["TurboFan<br/>top-tier optimizing compiler"]
+    SP -- "hot" --> MAG["Maglev<br/>mid-tier optimizing<br/>compiler"]
+    MAG -- "very hot" --> TF["TurboFan<br/>top-tier optimizing<br/>compiler"]
     MAG -. "deoptimize when an<br/>assumption breaks" .-> IGN
     TF -. "deoptimize" .-> IGN
 ```
@@ -463,9 +467,10 @@ Other things V8 provides: **isolates** (independent V8 instances with separate h
 **Generational GC.** Most objects die young (a temporary array inside a function, a request object). V8 exploits this with two main areas:
 
 ```mermaid
+%%{init: {"htmlLabels": false, "flowchart": {"htmlLabels": false, "wrappingWidth": 400, "padding": 24}}}%%
 flowchart LR
-    NEW(["new object"]) --> YOUNG["Young generation<br/>small, collected often<br/>by the Scavenger (fast copying GC)"]
-    YOUNG -- "survives two collections" --> OLD["Old generation<br/>large, collected less often<br/>Mark-Sweep-Compact"]
+    NEW(["new object"]) --> YOUNG["Young generation<br/>small, collected often<br/>by the Scavenger<br/>(fast copying GC)"]
+    YOUNG -- "survives two<br/>collections" --> OLD["Old generation<br/>large, collected<br/>less often by<br/>Mark-Sweep-Compact"]
     YOUNG -- "unreachable" --> FREE1(["memory reclaimed"])
     OLD -- "unreachable" --> FREE2(["memory reclaimed"])
 ```
@@ -503,14 +508,15 @@ libuv is the C library that gives Node its **event loop** and **cross-platform a
 The key idea: **the operating system can do many kinds of I/O without a thread waiting for it.** libuv uses the best mechanism each OS offers and falls back to a thread pool when no async API exists.
 
 ```mermaid
+%%{init: {"htmlLabels": false, "flowchart": {"htmlLabels": false, "wrappingWidth": 400, "padding": 24}}}%%
 flowchart TB
     JS["Your JavaScript<br/>(main thread)"] -- "socket.write, http.get" --> LOOP["libuv event loop<br/>(same main thread)"]
     JS -- "fs.readFile, dns.lookup,<br/>crypto.pbkdf2, zlib.gzip" --> LOOP
-    LOOP -- "network I/O" --> KERNEL["OS async notification<br/>epoll (Linux), kqueue (macOS/BSD),<br/>IOCP (Windows)"]
-    LOOP -- "work with no async OS API" --> POOL["libuv thread pool<br/>4 threads by default"]
+    LOOP -- "network I/O" --> KERNEL["OS async notification<br/>epoll on Linux<br/>kqueue on macOS/BSD<br/>IOCP on Windows"]
+    LOOP -- "work with no<br/>async OS API" --> POOL["libuv thread pool<br/>4 threads by default"]
     KERNEL -- "socket ready" --> LOOP
     POOL -- "task finished" --> LOOP
-    LOOP -- "run callback / resolve promise" --> JS
+    LOOP -- "run callback or<br/>resolve promise" --> JS
 ```
 
 | Work | Handled by |
@@ -534,12 +540,13 @@ flowchart TB
 The event loop is a loop in libuv that keeps asking: *"Is there anything ready to run?"* Each iteration (a "tick") goes through fixed **phases**, and each phase has its own queue of callbacks:
 
 ```mermaid
+%%{init: {"htmlLabels": false, "flowchart": {"htmlLabels": false, "wrappingWidth": 400, "padding": 24}}}%%
 flowchart TB
-    START(["node app.js<br/>run the main script synchronously"]) --> TIMERS
-    TIMERS["1. timers<br/>expired setTimeout / setInterval callbacks"] --> PENDING
-    PENDING["2. pending callbacks<br/>some deferred system I/O errors"] --> IDLE
+    START(["node app.js<br/>runs the main script<br/>synchronously"]) --> TIMERS
+    TIMERS["1. timers<br/>expired setTimeout and<br/>setInterval callbacks"] --> PENDING
+    PENDING["2. pending callbacks<br/>some deferred<br/>system I/O errors"] --> IDLE
     IDLE["3. idle, prepare<br/>internal use"] --> POLL
-    POLL["4. poll<br/>get new I/O events and run their callbacks<br/>(waits here if there is nothing else to do)"] --> CHECK
+    POLL["4. poll<br/>get new I/O events,<br/>run their callbacks<br/>(waits here when idle)"] --> CHECK
     CHECK["5. check<br/>setImmediate callbacks"] --> CLOSE
     CLOSE["6. close callbacks<br/>e.g. socket.on('close')"] --> ALIVE{"anything still<br/>pending?"}
     ALIVE -- "yes" --> TIMERS
@@ -721,6 +728,7 @@ Nesting many callbacks leads to "callback hell" (deep indentation, error handlin
 **2. Promises.** A promise is an object representing a value that will be available later.
 
 ```mermaid
+%%{init: {"htmlLabels": false, "flowchart": {"htmlLabels": false, "wrappingWidth": 400, "padding": 24}}}%%
 stateDiagram-v2
     [*] --> Pending
     Pending --> Fulfilled : resolve(value)
@@ -947,13 +955,14 @@ const { default: lodash } = await import('lodash'); // dynamic import: loads on 
 **How a module name is resolved:**
 
 ```mermaid
+%%{init: {"htmlLabels": false, "flowchart": {"htmlLabels": false, "wrappingWidth": 400, "padding": 24}}}%%
 flowchart TD
-    REQ["import x from 'specifier'"] --> CORE{"Built-in?<br/>'node:fs', 'fs', 'http'..."}
+    REQ["import x from<br/>'specifier'"] --> CORE{"Built-in?<br/>'node:fs', 'fs',<br/>'http'..."}
     CORE -- "yes" --> LOADCORE["Load the core module"]
     CORE -- "no" --> REL{"Starts with<br/>'./', '../' or '/'?"}
-    REL -- "yes" --> FILE["Resolve relative to the current file<br/>(ESM needs the exact file name)"]
-    REL -- "no, a bare name like 'express'" --> NM["Look in ./node_modules/express,<br/>then ../node_modules, up to the root"]
-    NM --> EXPORTS["Read that package.json:<br/>'exports' field (or 'main') points to the entry file"]
+    REL -- "yes" --> FILE["Resolve relative to<br/>the current file<br/>(ESM needs the exact<br/>file name)"]
+    REL -- "no, a bare name<br/>like 'express'" --> NM["Look in<br/>./node_modules/express<br/>then ../node_modules<br/>up to the root"]
+    NM --> EXPORTS["Read its package.json<br/>'exports' (or 'main')<br/>points to the entry file"]
 ```
 
 **Modules are cached.** A module runs **once**, the first time it is imported, and every later import gets the same instance. That makes module-level variables effectively singletons (useful for a shared DB pool or config; dangerous for per-request state).
@@ -1192,10 +1201,11 @@ Streams process data **piece by piece** (in chunks) instead of loading everythin
 | **Transform** | Duplex that modifies data passing through | `zlib.createGzip()`, encryption, CSV parsing |
 
 ```mermaid
+%%{init: {"htmlLabels": false, "flowchart": {"htmlLabels": false, "wrappingWidth": 400, "padding": 24}}}%%
 flowchart LR
-    R["Readable<br/>fs.createReadStream('access.log')"] -- "chunk" --> T["Transform<br/>zlib.createGzip()"]
-    T -- "chunk" --> W["Writable<br/>fs.createWriteStream('access.log.gz')"]
-    W -. "buffer full: pause upstream (backpressure)" .-> R
+    R["Readable<br/>fs.createReadStream()<br/>access.log"] -- "chunk" --> T["Transform<br/>zlib.createGzip()"]
+    T -- "chunk" --> W["Writable<br/>fs.createWriteStream()<br/>access.log.gz"]
+    W -. "buffer full: pause<br/>(backpressure)" .-> R
     W -. "'drain': resume" .-> R
 ```
 
@@ -1303,7 +1313,7 @@ This works, but notice what is missing: routing with parameters (`/users/:id`), 
 
 ```javascript
 const res = await fetch('https://api.github.com/repos/nodejs/node', {
-  headers: { 'user-agent': 'nodejs-quickstart' },
+  headers: { 'user-agent': 'understanding-nodejs-well' },
   signal: AbortSignal.timeout(5000),
 });
 if (!res.ok) throw new Error(`HTTP ${res.status}`); // fetch does NOT throw on 4xx/5xx
@@ -1325,18 +1335,19 @@ await fetch('https://httpbin.org/post', {
 The event loop handles *waiting* well, but CPU work blocks it. Node offers three ways to use more CPU cores:
 
 ```mermaid
+%%{init: {"htmlLabels": false, "flowchart": {"htmlLabels": false, "wrappingWidth": 400, "padding": 24}}}%%
 flowchart TB
-    subgraph WT["Worker threads: one process, several threads"]
-        MAIN["Main thread<br/>event loop + your server"] <-- "postMessage" --> W1["Worker 1<br/>own V8 isolate + event loop"]
+    subgraph WT["Worker threads"]
+        MAIN["Main thread<br/>event loop + your server"] <-- "postMessage" --> W1["Worker 1<br/>own V8 isolate<br/>+ event loop"]
         MAIN <-- "postMessage" --> W2["Worker 2"]
     end
-    subgraph CL["Cluster: several processes sharing one port"]
+    subgraph CL["Cluster (many processes)"]
         PRIMARY["Primary process"] --> P1["Worker process 1<br/>full copy of your app"]
         PRIMARY --> P2["Worker process 2"]
         PRIMARY --> P3["Worker process N"]
     end
-    subgraph CP["Child process: run any program"]
-        NODEP["Node process"] -- "spawn / execFile" --> EXT["ffmpeg, git, python, a shell script..."]
+    subgraph CP["Child process"]
+        NODEP["Node process"] -- "spawn / execFile" --> EXT["ffmpeg, git, python,<br/>shell scripts..."]
     end
 ```
 
@@ -1543,9 +1554,10 @@ A typical `package.json`:
 **Ranges are flexible, so you need a lockfile for reproducibility:**
 
 ```mermaid
+%%{init: {"htmlLabels": false, "flowchart": {"htmlLabels": false, "wrappingWidth": 400, "padding": 24}}}%%
 flowchart LR
-    PJ["package.json<br/>express: ^5.1.0<br/>(the range you allow)"] -- "npm install<br/>picks the newest match" --> LOCK["package-lock.json<br/>express 5.3.0 + every<br/>sub-dependency, exact versions<br/>and integrity hashes"]
-    LOCK -- "npm ci<br/>installs exactly this tree" --> NM["node_modules/<br/>identical on every machine"]
+    PJ["package.json<br/>express: ^5.1.0<br/>(the range you allow)"] -- "npm install<br/>picks the newest match" --> LOCK["package-lock.json<br/>express 5.3.0 + every<br/>sub-dependency, with<br/>exact versions and<br/>integrity hashes"]
+    LOCK -- "npm ci<br/>installs exactly<br/>this tree" --> NM["node_modules/<br/>identical on<br/>every machine"]
 ```
 
 - `package-lock.json` records the **exact** version of every package in the tree, including dependencies of dependencies, plus integrity hashes.
@@ -1833,6 +1845,7 @@ console.log(`took ${(performance.now() - start).toFixed(1)} ms`);
 **The middleware model** is the key idea behind Express (and Koa, Fastify hooks, ASP.NET Core, Django middleware...). A request passes through a **chain of functions**. Each one can read or modify `req`/`res`, end the response, or call `next()` to pass control on:
 
 ```mermaid
+%%{init: {"htmlLabels": false, "flowchart": {"htmlLabels": false, "wrappingWidth": 400, "padding": 24}}}%%
 flowchart LR
     REQ(["HTTP request"]) --> J["express.json()<br/>parse the body"]
     J --> L["requestLogger<br/>start a timer"]
@@ -1900,12 +1913,13 @@ Errors always look the same:
 **Architecture**
 
 ```mermaid
+%%{init: {"htmlLabels": false, "flowchart": {"htmlLabels": false, "wrappingWidth": 400, "padding": 24}}}%%
 flowchart TB
-    CLIENT(["Client: curl, browser, mobile app, another service"]) -- "HTTP + JSON" --> MW
-    subgraph API["Tasks API (one Node.js process)"]
-        MW["Middleware<br/>JSON parsing, logging"] --> ROUTES["Routes (HTTP layer)<br/>validate input, map HTTP to service calls"]
-        ROUTES --> SERVICE["Service (business layer)<br/>rules such as 'task must exist'"]
-        SERVICE --> REPO["Repository (data layer)<br/>the only code that knows how data is stored"]
+    CLIENT(["Client<br/>curl, browser, app,<br/>another service"]) -- "HTTP + JSON" --> MW
+    subgraph API["Tasks API"]
+        MW["Middleware<br/>JSON parsing, logging"] --> ROUTES["Routes (HTTP layer)<br/>validate input,<br/>call the service"]
+        ROUTES --> SERVICE["Service (business layer)<br/>rules such as<br/>'task must exist'"]
+        SERVICE --> REPO["Repository (data layer)<br/>the only code that<br/>knows the storage"]
         ROUTES -. "errors" .-> ERR["Error handler<br/>consistent JSON errors"]
         SERVICE -. "errors" .-> ERR
     end
@@ -2564,6 +2578,7 @@ app.use(cors({ origin: ['https://my-frontend.example.com'] }));
 - **A layered filesystem** (OverlayFS): the image's read-only layers stacked together, plus a thin writable layer on top.
 
 ```mermaid
+%%{init: {"htmlLabels": false, "flowchart": {"htmlLabels": false, "wrappingWidth": 400, "padding": 24}}}%%
 flowchart TB
     subgraph VMS["Virtual machines"]
         direction TB
@@ -2607,6 +2622,7 @@ flowchart TB
 **The workflow:**
 
 ```mermaid
+%%{init: {"htmlLabels": false, "flowchart": {"htmlLabels": false, "wrappingWidth": 400, "padding": 24}}}%%
 flowchart LR
     DF["Dockerfile<br/>(recipe)"] -- "docker build" --> IMG["Image<br/>(read-only layers)"]
     IMG -- "docker run" --> CON["Container<br/>(running process)"]
@@ -2617,6 +2633,7 @@ flowchart LR
 **The engines behind Docker.** Like Node.js, Docker is a stack of components:
 
 ```mermaid
+%%{init: {"htmlLabels": false, "flowchart": {"htmlLabels": false, "wrappingWidth": 400, "padding": 24}}}%%
 flowchart LR
     CLI["docker CLI<br/>(what you type)"] -- "REST API" --> D["dockerd<br/>Docker Engine daemon"]
     D --> CTR["containerd<br/>manages image and<br/>container lifecycles"]
@@ -2718,11 +2735,12 @@ What each part does:
 **Why the order of instructions matters (layer caching):**
 
 ```mermaid
+%%{init: {"htmlLabels": false, "flowchart": {"htmlLabels": false, "wrappingWidth": 400, "padding": 24}}}%%
 flowchart BT
-    L1["FROM node:26-alpine<br/>base OS + Node (downloaded once)"] --> L2["WORKDIR /app"]
-    L2 --> L3["COPY package.json package-lock.json<br/>changes rarely"]
-    L3 --> L4["RUN npm ci --omit=dev<br/>slow, but CACHED while the manifests are unchanged"]
-    L4 --> L5["COPY src<br/>changes on every commit, but cheap"]
+    L1["FROM node:26-alpine<br/>base OS + Node<br/>(downloaded once)"] --> L2["WORKDIR /app"]
+    L2 --> L3["COPY package.json<br/>package-lock.json<br/>changes rarely"]
+    L3 --> L4["RUN npm ci --omit=dev<br/>slow, but CACHED while<br/>manifests are unchanged"]
+    L4 --> L5["COPY src<br/>changes on every<br/>commit, but cheap"]
 ```
 
 Docker reuses a cached layer until one of its inputs changes; after that, **every later layer is rebuilt**. If you copied all the source code before running `npm ci`, every one-line code change would reinstall every dependency.
@@ -2766,6 +2784,7 @@ RUN npm run build               # e.g. tsc -> dist/
 Real apps need more than one container: the API, a database, maybe Redis. **Docker Compose** describes them all in one file and starts them with one command. Containers in the same Compose project share a network and reach each other **by service name** (the API connects to the host `db`).
 
 ```mermaid
+%%{init: {"htmlLabels": false, "flowchart": {"htmlLabels": false, "wrappingWidth": 400, "padding": 24}}}%%
 flowchart LR
     YOU(["You<br/>localhost:3000"]) --> API["api container<br/>node src/server.js"]
     API -- "postgres://db:5432" --> DB[("db container<br/>PostgreSQL")]
@@ -3036,14 +3055,15 @@ Further reading: the official [Node.js security best practices](https://nodejs.o
 - **Horizontal:** more instances behind a load balancer. This requires **stateless** instances: sessions in Redis or signed tokens, files in object storage (S3), never in process memory or on the local disk.
 
 ```mermaid
+%%{init: {"htmlLabels": false, "flowchart": {"htmlLabels": false, "wrappingWidth": 400, "padding": 24}}}%%
 flowchart LR
-    USERS(["Users"]) --> LB["Load balancer / reverse proxy<br/>nginx, cloud LB, Kubernetes Service"]
+    USERS(["Users"]) --> LB["Load balancer<br/>or reverse proxy<br/>nginx, cloud LB,<br/>Kubernetes Service"]
     LB --> A1["API container 1"]
     LB --> A2["API container 2"]
     LB --> A3["API container 3"]
     A1 & A2 & A3 --> DB[("PostgreSQL")]
-    A1 & A2 & A3 --> CACHE[("Redis<br/>cache, sessions, rate limits")]
-    A1 & A2 & A3 --> Q[["Job queue"]] --> WORKER["Worker containers<br/>emails, reports, image processing"]
+    A1 & A2 & A3 --> CACHE[("Redis<br/>cache, sessions,<br/>rate limits")]
+    A1 & A2 & A3 --> Q[["Job queue"]] --> WORKER["Worker containers<br/>emails, reports,<br/>image processing"]
 ```
 
 **Deployment options**
@@ -3059,12 +3079,13 @@ flowchart LR
 **A typical CI/CD pipeline:**
 
 ```mermaid
+%%{init: {"htmlLabels": false, "flowchart": {"htmlLabels": false, "wrappingWidth": 400, "padding": 24}}}%%
 flowchart LR
     PUSH["git push /<br/>pull request"] --> CI["CI<br/>npm ci, lint, test"]
     CI --> BUILD["docker build<br/>+ vulnerability scan"]
     BUILD --> REGISTRY[("Container registry")]
     REGISTRY --> STAGING["Deploy to staging<br/>smoke tests"]
-    STAGING --> PRODUCTION["Deploy to production<br/>rolling update, health checks"]
+    STAGING --> PRODUCTION["Deploy to production<br/>rolling update,<br/>health checks"]
 ```
 
 ### 46. Upgrading Node.js safely
