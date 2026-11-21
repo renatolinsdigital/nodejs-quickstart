@@ -4,7 +4,7 @@
 
 ![Repo Banner](img/banner.jpg)
 
-Node.js was created by Ryan Dahl in 2009 to run JavaScript **outside the browser**, on servers. He took Google's V8 JavaScript engine, attached an event loop and non-blocking I/O to it, and showed that one process could handle thousands of concurrent connections without one thread per connection. Since then Node.js has become one of the most widely used platforms for web APIs, real-time services, command-line tools, build tooling (almost every front-end tool runs on Node), desktop apps (Electron) and serverless functions.
+Node.js was created by Ryan Dahl in 2009 to run JavaScript **outside the browser**, on servers. He took Google's V8 JavaScript engine, attached an event loop and non-blocking I/O to it, and showed that one process could handle thousands of concurrent connections. Since then Node.js has become one of the most widely used platforms for web APIs, real-time services, command-line tools, build tooling (almost every front-end tool runs on Node), desktop apps (Electron) and serverless functions.
 
 This guide goes from "what is Node.js?" to a tested Express REST API running in Docker. Along the way it explains **the engines underneath** (V8, libuv, the event loop), because knowing those is what lets you reason about performance, debug odd behavior and pick up any new version, or a different language, quickly.
 
